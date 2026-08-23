@@ -47,20 +47,30 @@ export default function HomePage() {
               </p>
 
               <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-                <Link
-                  href="/products"
-                  className="bg-[#111111] px-8 py-4 text-center text-sm font-medium text-white transition hover:bg-[#c6a15b]"
-                >
-                  Shop Collection
-                </Link>
 
-                <Link
-                  href="/categories/women"
-                  className="border border-[#111111] px-8 py-4 text-center text-sm font-medium transition hover:bg-[#111111] hover:text-white"
-                >
-                  Explore Women
-                </Link>
-              </div>
+  {/* SHOP COLLECTION */}
+  <Link
+    href="/products"
+    className="group inline-flex items-center justify-center gap-3 border border-[#111111] bg-[#111111] px-8 py-4 text-sm font-semibold uppercase tracking-[0.12em] text-white transition-all duration-300 hover:bg-[#c6a15b] hover:border-[#c6a15b]"
+  >
+    <span>Shop Collection</span>
+    <span className="text-base transition-transform duration-300 group-hover:translate-x-1">
+      →
+    </span>
+  </Link>
+
+  {/* EXPLORE WOMEN */}
+  <Link
+    href="/products"
+    className="group inline-flex items-center justify-center gap-3 border border-[#111111] bg-transparent px-8 py-4 text-sm font-semibold uppercase tracking-[0.12em] text-[#111111] transition-all duration-300 hover:bg-[#111111] hover:text-white"
+  >
+    <span>Explore Women</span>
+    <span className="text-base transition-transform duration-300 group-hover:translate-x-1">
+      →
+    </span>
+  </Link>
+
+</div>
 
             </div>
 
