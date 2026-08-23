@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
 import Navbar from "@/components/navbar/Navbar";
@@ -10,13 +10,10 @@ import ProductGrid from "@/components/products/ProductGrid";
 import products from "@/data/products";
 import categories from "@/data/categories";
 
-export default function ProductsPage() {
+function ProductsContent() {
   const searchParams = useSearchParams();
 
-  // =========================
-  // SEARCH
-  // =========================
-
+  // Search coming from Navbar URL
   const urlSearch = searchParams.get("search") || "";
 
   const [search, setSearch] = useState(urlSearch);
@@ -24,21 +21,26 @@ export default function ProductsPage() {
   const [sort, setSort] = useState("featured");
   const [maxPrice, setMaxPrice] = useState(5000);
 
-  // =========================
-  // FILTER + SORT
-  // =========================
+  // ==========================================
+  // FILTER + SORT PRODUCTS
+  // ==========================================
 
   const filteredProducts = useMemo(() => {
     let result = [...products];
 
+    // =========================
     // SEARCH
+    // =========================
+
     if (search.trim()) {
       const query = search.trim().toLowerCase();
 
       result = result.filter((product) => {
         const name = product.name?.toLowerCase() || "";
+
         const productCategory =
           product.category?.toLowerCase() || "";
+
         const subcategory =
           product.subcategory?.toLowerCase() || "";
 
@@ -50,7 +52,10 @@ export default function ProductsPage() {
       });
     }
 
+    // =========================
     // CATEGORY
+    // =========================
+
     if (category !== "All") {
       result = result.filter(
         (product) =>
@@ -59,12 +64,18 @@ export default function ProductsPage() {
       );
     }
 
+    // =========================
     // PRICE
+    // =========================
+
     result = result.filter(
       (product) => product.price <= maxPrice
     );
 
-    // SORT
+    // =========================
+    // SORTING
+    // =========================
+
     if (sort === "price-low") {
       result.sort((a, b) => a.price - b.price);
     }
@@ -74,19 +85,23 @@ export default function ProductsPage() {
     }
 
     if (sort === "rating") {
-      result.sort((a, b) => b.rating - a.rating);
+      result.sort(
+        (a, b) => (b.rating || 0) - (a.rating || 0)
+      );
     }
 
     if (sort === "discount") {
-      result.sort((a, b) => b.discount - a.discount);
+      result.sort(
+        (a, b) => (b.discount || 0) - (a.discount || 0)
+      );
     }
 
     return result;
   }, [search, category, maxPrice, sort]);
 
-  // =========================
+  // ==========================================
   // CLEAR FILTERS
-  // =========================
+  // ==========================================
 
   const clearFilters = () => {
     setSearch("");
@@ -107,23 +122,23 @@ export default function ProductsPage() {
 
       <main className="min-h-screen bg-[#f5efe6]">
 
-        {/* =================================================
+        {/* =====================================
             PAGE HEADER
-        ================================================= */}
+        ===================================== */}
 
         <section className="border-b border-black/10 bg-[#f5efe6] px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
 
           <div className="mx-auto max-w-7xl">
 
-            <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[#c6a15b] sm:text-xs sm:tracking-[0.3em]">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-[#c6a15b] sm:text-xs">
               LUXORA Collection
             </p>
 
-            <h1 className="mt-2 font-serif text-3xl leading-tight text-[#111111] sm:mt-3 sm:text-5xl">
+            <h1 className="mt-3 font-serif text-3xl text-[#111111] sm:text-4xl lg:text-5xl">
               All Products
             </h1>
 
-            <p className="mt-3 max-w-xl text-xs leading-6 text-[#6b6258] sm:mt-4 sm:text-sm">
+            <p className="mt-4 max-w-xl text-xs leading-6 text-[#6b6258] sm:text-sm">
               Discover our curated collection of timeless
               fashion, modern essentials and luxury
               accessories.
@@ -133,19 +148,19 @@ export default function ProductsPage() {
 
         </section>
 
-        {/* =================================================
+        {/* =====================================
             SHOP AREA
-        ================================================= */}
+        ===================================== */}
 
         <section className="px-4 py-7 sm:px-6 sm:py-10 lg:px-8">
 
           <div className="mx-auto max-w-7xl">
 
-            {/* =================================================
+            {/* =================================
                 SEARCH + SORT
-            ================================================= */}
+            ================================= */}
 
-            <div className="flex flex-col gap-3 border-b border-black/10 pb-5 sm:gap-4 sm:pb-6 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex flex-col gap-3 border-b border-black/10 pb-5 sm:gap-4 lg:flex-row lg:items-center lg:justify-between">
 
               {/* SEARCH */}
 
@@ -158,7 +173,7 @@ export default function ProductsPage() {
                     setSearch(e.target.value)
                   }
                   placeholder="Search products..."
-                  className="h-11 w-full border border-black/15 bg-white px-4 pr-10 text-xs outline-none transition focus:border-[#c6a15b] sm:h-12 sm:text-sm"
+                  className="w-full border border-black/15 bg-white px-4 py-3 pr-10 text-sm outline-none transition focus:border-[#c6a15b]"
                 />
 
                 <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">
@@ -174,8 +189,9 @@ export default function ProductsPage() {
                 onChange={(e) =>
                   setSort(e.target.value)
                 }
-                className="h-11 w-full border border-black/15 bg-white px-4 text-xs outline-none focus:border-[#c6a15b] sm:h-12 sm:text-sm lg:w-auto lg:min-w-[190px]"
+                className="w-full border border-black/15 bg-white px-4 py-3 text-sm outline-none focus:border-[#c6a15b] sm:w-auto"
               >
+
                 <option value="featured">
                   Sort: Featured
                 </option>
@@ -195,19 +211,20 @@ export default function ProductsPage() {
                 <option value="discount">
                   Biggest Discount
                 </option>
+
               </select>
 
             </div>
 
-            {/* =================================================
-                SHOP CONTENT
-            ================================================= */}
+            {/* =================================
+                SHOP GRID
+            ================================= */}
 
-            <div className="mt-6 lg:mt-8 lg:grid lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-8">
+            <div className="mt-6 grid gap-7 sm:mt-8 sm:gap-8 lg:grid-cols-[230px_1fr]">
 
-              {/* =================================================
+              {/* =================================
                   DESKTOP SIDEBAR
-              ================================================= */}
+              ================================= */}
 
               <aside className="hidden lg:block">
 
@@ -223,6 +240,8 @@ export default function ProductsPage() {
 
                     <div className="mt-5 space-y-3">
 
+                      {/* ALL */}
+
                       <button
                         type="button"
                         onClick={() =>
@@ -236,6 +255,8 @@ export default function ProductsPage() {
                       >
                         All Products
                       </button>
+
+                      {/* CATEGORY LIST */}
 
                       {categories.map((item) => (
                         <button
@@ -258,7 +279,7 @@ export default function ProductsPage() {
 
                   </div>
 
-                  {/* PRICE */}
+                  {/* PRICE FILTER */}
 
                   <div className="pt-7">
 
@@ -281,6 +302,7 @@ export default function ProductsPage() {
                     />
 
                     <div className="mt-3 flex justify-between text-xs text-[#6b6258]">
+
                       <span>₹500</span>
 
                       <span>
@@ -289,6 +311,7 @@ export default function ProductsPage() {
                           "en-IN"
                         )}
                       </span>
+
                     </div>
 
                   </div>
@@ -297,58 +320,58 @@ export default function ProductsPage() {
 
               </aside>
 
-              {/* =================================================
+              {/* =================================
                   PRODUCTS AREA
-              ================================================= */}
+              ================================= */}
 
               <div className="min-w-0">
 
-                {/* =================================================
-                    MOBILE CATEGORY FILTER
-                ================================================= */}
+                {/* =================================
+                    MOBILE CATEGORIES
+                ================================= */}
 
-                <div className="mb-5 -mx-4 overflow-x-auto px-4 pb-2 sm:-mx-6 sm:px-6 lg:hidden">
+                <div className="mb-5 flex gap-2 overflow-x-auto pb-2 lg:hidden">
 
-                  <div className="flex w-max gap-2">
+                  {/* ALL */}
 
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setCategory("All")
+                    }
+                    className={`shrink-0 whitespace-nowrap border px-4 py-2 text-xs ${
+                      category === "All"
+                        ? "border-[#111111] bg-[#111111] text-white"
+                        : "border-black/15 bg-white text-[#111111]"
+                    }`}
+                  >
+                    All
+                  </button>
+
+                  {/* CATEGORIES */}
+
+                  {categories.map((item) => (
                     <button
                       type="button"
+                      key={item.id}
                       onClick={() =>
-                        setCategory("All")
+                        setCategory(item.name)
                       }
-                      className={`whitespace-nowrap border px-4 py-2.5 text-[10px] font-medium uppercase tracking-wider transition ${
-                        category === "All"
+                      className={`shrink-0 whitespace-nowrap border px-4 py-2 text-xs ${
+                        category === item.name
                           ? "border-[#111111] bg-[#111111] text-white"
                           : "border-black/15 bg-white text-[#111111]"
                       }`}
                     >
-                      All
+                      {item.name}
                     </button>
-
-                    {categories.map((item) => (
-                      <button
-                        type="button"
-                        key={item.id}
-                        onClick={() =>
-                          setCategory(item.name)
-                        }
-                        className={`whitespace-nowrap border px-4 py-2.5 text-[10px] font-medium uppercase tracking-wider transition ${
-                          category === item.name
-                            ? "border-[#111111] bg-[#111111] text-white"
-                            : "border-black/15 bg-white text-[#111111]"
-                        }`}
-                      >
-                        {item.name}
-                      </button>
-                    ))}
-
-                  </div>
+                  ))}
 
                 </div>
 
-                {/* =================================================
-                    COUNT + CLEAR
-                ================================================= */}
+                {/* =================================
+                    PRODUCT COUNT
+                ================================= */}
 
                 <div className="mb-5 flex items-center justify-between gap-3">
 
@@ -363,6 +386,8 @@ export default function ProductsPage() {
                       : "products"}
 
                   </p>
+
+                  {/* CLEAR FILTERS */}
 
                   {(search ||
                     category !== "All" ||
@@ -379,14 +404,45 @@ export default function ProductsPage() {
 
                 </div>
 
-                {/* =================================================
+                {/* =================================
                     PRODUCT GRID
-                ================================================= */}
+                ================================= */}
 
                 {filteredProducts.length > 0 && (
                   <ProductGrid
                     products={filteredProducts}
                   />
+                )}
+
+                {/* =================================
+                    EMPTY STATE
+                ================================= */}
+
+                {filteredProducts.length === 0 && (
+                  <div className="bg-white px-6 py-14 text-center sm:px-8 sm:py-16">
+
+                    <div className="text-4xl">
+                      ♡
+                    </div>
+
+                    <p className="mt-5 font-serif text-2xl text-[#111111]">
+                      No products found
+                    </p>
+
+                    <p className="mt-3 text-sm text-[#6b6258]">
+                      Try changing your search or
+                      filters.
+                    </p>
+
+                    <button
+                      type="button"
+                      onClick={clearFilters}
+                      className="mt-6 bg-[#111111] px-7 py-3 text-xs font-semibold uppercase tracking-wider text-white transition hover:bg-[#c6a15b]"
+                    >
+                      Clear Filters
+                    </button>
+
+                  </div>
                 )}
 
               </div>
@@ -397,47 +453,37 @@ export default function ProductsPage() {
 
         </section>
 
-        {/* =================================================
-            EMPTY STATE
-        ================================================= */}
-
-        {filteredProducts.length === 0 && (
-          <section className="px-4 pb-16 sm:px-6 sm:pb-20">
-
-            <div className="mx-auto max-w-xl text-center">
-
-              <div className="bg-white px-5 py-12 sm:px-8 sm:py-16">
-
-                <div className="text-4xl">
-                  ♡
-                </div>
-
-                <p className="mt-5 font-serif text-xl text-[#111111] sm:text-2xl">
-                  No products found
-                </p>
-
-                <p className="mt-3 text-xs text-[#6b6258] sm:text-sm">
-                  Try changing your search or filters.
-                </p>
-
-                <button
-                  type="button"
-                  onClick={clearFilters}
-                  className="mt-6 bg-[#111111] px-6 py-3 text-[10px] font-semibold uppercase tracking-wider text-white transition hover:bg-[#c6a15b] sm:px-7 sm:text-xs"
-                >
-                  Clear Filters
-                </button>
-
-              </div>
-
-            </div>
-
-          </section>
-        )}
-
       </main>
 
       <Footer />
     </>
+  );
+}
+
+// ==========================================
+// PRODUCTS PAGE
+// Suspense fixes Next.js 16 useSearchParams
+// production build error
+// ==========================================
+
+export default function ProductsPage() {
+  return (
+    <Suspense
+      fallback={
+        <>
+          <Navbar />
+
+          <main className="flex min-h-[60vh] items-center justify-center bg-[#f5efe6] px-6">
+            <p className="text-sm text-[#6b6258]">
+              Loading products...
+            </p>
+          </main>
+
+          <Footer />
+        </>
+      }
+    >
+      <ProductsContent />
+    </Suspense>
   );
 }
