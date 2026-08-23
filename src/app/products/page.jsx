@@ -13,30 +13,39 @@ import categories from "@/data/categories";
 function ProductsContent() {
   const searchParams = useSearchParams();
 
-  // Search coming from Navbar URL
+  // =====================================================
+  // URL PARAMETERS
+  // =====================================================
+
   const urlSearch = searchParams.get("search") || "";
+  const urlCategory = searchParams.get("category") || "All";
+
+  // =====================================================
+  // STATES
+  // =====================================================
 
   const [search, setSearch] = useState(urlSearch);
-  const [category, setCategory] = useState("All");
+  const [category, setCategory] = useState(urlCategory);
   const [sort, setSort] = useState("featured");
   const [maxPrice, setMaxPrice] = useState(5000);
 
-  // ==========================================
-  // FILTER + SORT PRODUCTS
-  // ==========================================
+  // =====================================================
+  // FILTER + SORT
+  // =====================================================
 
   const filteredProducts = useMemo(() => {
     let result = [...products];
 
-    // =========================
+    // ---------------------------------------------------
     // SEARCH
-    // =========================
+    // ---------------------------------------------------
 
     if (search.trim()) {
       const query = search.trim().toLowerCase();
 
       result = result.filter((product) => {
-        const name = product.name?.toLowerCase() || "";
+        const name =
+          product.name?.toLowerCase() || "";
 
         const productCategory =
           product.category?.toLowerCase() || "";
@@ -52,9 +61,9 @@ function ProductsContent() {
       });
     }
 
-    // =========================
+    // ---------------------------------------------------
     // CATEGORY
-    // =========================
+    // ---------------------------------------------------
 
     if (category !== "All") {
       result = result.filter(
@@ -64,44 +73,108 @@ function ProductsContent() {
       );
     }
 
-    // =========================
+    // ---------------------------------------------------
     // PRICE
-    // =========================
+    // ---------------------------------------------------
 
     result = result.filter(
       (product) => product.price <= maxPrice
     );
 
-    // =========================
-    // SORTING
-    // =========================
+    // ---------------------------------------------------
+    // SORT
+    // ---------------------------------------------------
 
     if (sort === "price-low") {
-      result.sort((a, b) => a.price - b.price);
+      result.sort(
+        (a, b) => a.price - b.price
+      );
     }
 
     if (sort === "price-high") {
-      result.sort((a, b) => b.price - a.price);
+      result.sort(
+        (a, b) => b.price - a.price
+      );
     }
 
     if (sort === "rating") {
       result.sort(
-        (a, b) => (b.rating || 0) - (a.rating || 0)
+        (a, b) =>
+          (b.rating || 0) -
+          (a.rating || 0)
       );
     }
 
     if (sort === "discount") {
       result.sort(
-        (a, b) => (b.discount || 0) - (a.discount || 0)
+        (a, b) =>
+          (b.discount || 0) -
+          (a.discount || 0)
       );
     }
 
     return result;
   }, [search, category, maxPrice, sort]);
 
-  // ==========================================
+  // =====================================================
+  // CATEGORY CHANGE
+  // =====================================================
+
+  const handleCategoryChange = (newCategory) => {
+    setCategory(newCategory);
+
+    const params = new URLSearchParams();
+
+    if (search.trim()) {
+      params.set("search", search.trim());
+    }
+
+    if (newCategory !== "All") {
+      params.set("category", newCategory);
+    }
+
+    const queryString = params.toString();
+
+    window.history.replaceState(
+      {},
+      "",
+      queryString
+        ? `/products?${queryString}`
+        : "/products"
+    );
+  };
+
+  // =====================================================
+  // SEARCH CHANGE
+  // =====================================================
+
+  const handleSearchChange = (value) => {
+    setSearch(value);
+
+    const params = new URLSearchParams();
+
+    if (value.trim()) {
+      params.set("search", value.trim());
+    }
+
+    if (category !== "All") {
+      params.set("category", category);
+    }
+
+    const queryString = params.toString();
+
+    window.history.replaceState(
+      {},
+      "",
+      queryString
+        ? `/products?${queryString}`
+        : "/products"
+    );
+  };
+
+  // =====================================================
   // CLEAR FILTERS
-  // ==========================================
+  // =====================================================
 
   const clearFilters = () => {
     setSearch("");
@@ -116,15 +189,19 @@ function ProductsContent() {
     );
   };
 
+  // =====================================================
+  // PAGE
+  // =====================================================
+
   return (
     <>
       <Navbar />
 
       <main className="min-h-screen bg-[#f5efe6]">
 
-        {/* =====================================
-            PAGE HEADER
-        ===================================== */}
+        {/* =================================================
+            HEADER
+        ================================================= */}
 
         <section className="border-b border-black/10 bg-[#f5efe6] px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
 
@@ -135,30 +212,32 @@ function ProductsContent() {
             </p>
 
             <h1 className="mt-3 font-serif text-3xl text-[#111111] sm:text-4xl lg:text-5xl">
-              All Products
+              {category === "All"
+                ? "All Products"
+                : category}
             </h1>
 
             <p className="mt-4 max-w-xl text-xs leading-6 text-[#6b6258] sm:text-sm">
-              Discover our curated collection of timeless
-              fashion, modern essentials and luxury
-              accessories.
+              Discover our curated collection of
+              timeless fashion, modern essentials
+              and luxury accessories.
             </p>
 
           </div>
 
         </section>
 
-        {/* =====================================
+        {/* =================================================
             SHOP AREA
-        ===================================== */}
+        ================================================= */}
 
         <section className="px-4 py-7 sm:px-6 sm:py-10 lg:px-8">
 
           <div className="mx-auto max-w-7xl">
 
-            {/* =================================
+            {/* =================================================
                 SEARCH + SORT
-            ================================= */}
+            ================================================= */}
 
             <div className="flex flex-col gap-3 border-b border-black/10 pb-5 sm:gap-4 lg:flex-row lg:items-center lg:justify-between">
 
@@ -170,7 +249,9 @@ function ProductsContent() {
                   type="search"
                   value={search}
                   onChange={(e) =>
-                    setSearch(e.target.value)
+                    handleSearchChange(
+                      e.target.value
+                    )
                   }
                   placeholder="Search products..."
                   className="w-full border border-black/15 bg-white px-4 py-3 pr-10 text-sm outline-none transition focus:border-[#c6a15b]"
@@ -216,15 +297,15 @@ function ProductsContent() {
 
             </div>
 
-            {/* =================================
-                SHOP GRID
-            ================================= */}
+            {/* =================================================
+                MAIN SHOP LAYOUT
+            ================================================= */}
 
-            <div className="mt-6 grid gap-7 sm:mt-8 sm:gap-8 lg:grid-cols-[230px_1fr]">
+            <div className="mt-6 grid gap-7 sm:mt-8 sm:gap-8 lg:grid-cols-[230px_minmax(0,1fr)]">
 
-              {/* =================================
+              {/* =================================================
                   DESKTOP SIDEBAR
-              ================================= */}
+              ================================================= */}
 
               <aside className="hidden lg:block">
 
@@ -245,7 +326,9 @@ function ProductsContent() {
                       <button
                         type="button"
                         onClick={() =>
-                          setCategory("All")
+                          handleCategoryChange(
+                            "All"
+                          )
                         }
                         className={`block w-full text-left text-sm transition ${
                           category === "All"
@@ -259,11 +342,14 @@ function ProductsContent() {
                       {/* CATEGORY LIST */}
 
                       {categories.map((item) => (
+
                         <button
                           type="button"
                           key={item.id}
                           onClick={() =>
-                            setCategory(item.name)
+                            handleCategoryChange(
+                              item.name
+                            )
                           }
                           className={`block w-full text-left text-sm transition ${
                             category === item.name
@@ -273,13 +359,14 @@ function ProductsContent() {
                         >
                           {item.name}
                         </button>
+
                       ))}
 
                     </div>
 
                   </div>
 
-                  {/* PRICE FILTER */}
+                  {/* PRICE */}
 
                   <div className="pt-7">
 
@@ -303,7 +390,9 @@ function ProductsContent() {
 
                     <div className="mt-3 flex justify-between text-xs text-[#6b6258]">
 
-                      <span>₹500</span>
+                      <span>
+                        ₹500
+                      </span>
 
                       <span>
                         ₹
@@ -320,15 +409,13 @@ function ProductsContent() {
 
               </aside>
 
-              {/* =================================
-                  PRODUCTS AREA
-              ================================= */}
+              {/* =================================================
+                  PRODUCTS
+              ================================================= */}
 
               <div className="min-w-0">
 
-                {/* =================================
-                    MOBILE CATEGORIES
-                ================================= */}
+                {/* MOBILE CATEGORY FILTER */}
 
                 <div className="mb-5 flex gap-2 overflow-x-auto pb-2 lg:hidden">
 
@@ -337,7 +424,9 @@ function ProductsContent() {
                   <button
                     type="button"
                     onClick={() =>
-                      setCategory("All")
+                      handleCategoryChange(
+                        "All"
+                      )
                     }
                     className={`shrink-0 whitespace-nowrap border px-4 py-2 text-xs ${
                       category === "All"
@@ -351,11 +440,14 @@ function ProductsContent() {
                   {/* CATEGORIES */}
 
                   {categories.map((item) => (
+
                     <button
                       type="button"
                       key={item.id}
                       onClick={() =>
-                        setCategory(item.name)
+                        handleCategoryChange(
+                          item.name
+                        )
                       }
                       className={`shrink-0 whitespace-nowrap border px-4 py-2 text-xs ${
                         category === item.name
@@ -365,13 +457,12 @@ function ProductsContent() {
                     >
                       {item.name}
                     </button>
+
                   ))}
 
                 </div>
 
-                {/* =================================
-                    PRODUCT COUNT
-                ================================= */}
+                {/* PRODUCT COUNT */}
 
                 <div className="mb-5 flex items-center justify-between gap-3">
 
@@ -387,12 +478,13 @@ function ProductsContent() {
 
                   </p>
 
-                  {/* CLEAR FILTERS */}
+                  {/* CLEAR */}
 
                   {(search ||
                     category !== "All" ||
                     maxPrice !== 5000 ||
                     sort !== "featured") && (
+
                     <button
                       type="button"
                       onClick={clearFilters}
@@ -400,13 +492,12 @@ function ProductsContent() {
                     >
                       Clear Filters
                     </button>
+
                   )}
 
                 </div>
 
-                {/* =================================
-                    PRODUCT GRID
-                ================================= */}
+                {/* PRODUCT GRID */}
 
                 {filteredProducts.length > 0 && (
                   <ProductGrid
@@ -414,11 +505,10 @@ function ProductsContent() {
                   />
                 )}
 
-                {/* =================================
-                    EMPTY STATE
-                ================================= */}
+                {/* EMPTY */}
 
                 {filteredProducts.length === 0 && (
+
                   <div className="bg-white px-6 py-14 text-center sm:px-8 sm:py-16">
 
                     <div className="text-4xl">
@@ -430,8 +520,8 @@ function ProductsContent() {
                     </p>
 
                     <p className="mt-3 text-sm text-[#6b6258]">
-                      Try changing your search or
-                      filters.
+                      Try changing your search
+                      or filters.
                     </p>
 
                     <button
@@ -443,6 +533,7 @@ function ProductsContent() {
                     </button>
 
                   </div>
+
                 )}
 
               </div>
@@ -460,11 +551,9 @@ function ProductsContent() {
   );
 }
 
-// ==========================================
+// =====================================================
 // PRODUCTS PAGE
-// Suspense fixes Next.js 16 useSearchParams
-// production build error
-// ==========================================
+// =====================================================
 
 export default function ProductsPage() {
   return (
@@ -474,9 +563,11 @@ export default function ProductsPage() {
           <Navbar />
 
           <main className="flex min-h-[60vh] items-center justify-center bg-[#f5efe6] px-6">
+
             <p className="text-sm text-[#6b6258]">
               Loading products...
             </p>
+
           </main>
 
           <Footer />
