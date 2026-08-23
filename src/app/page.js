@@ -49,15 +49,12 @@ export default function HomePage() {
               <div className="mt-9 flex flex-col gap-3 sm:flex-row">
 
   {/* SHOP COLLECTION */}
-  <Link
-    href="/products"
-    className="group inline-flex items-center justify-center gap-3 border border-[#111111] bg-[#111111] px-8 py-4 text-sm font-semibold uppercase tracking-[0.12em] text-white transition-all duration-300 hover:bg-[#c6a15b] hover:border-[#c6a15b]"
-  >
-    <span>Shop Collection</span>
-    <span className="text-base transition-transform duration-300 group-hover:translate-x-1">
-      →
-    </span>
-  </Link>
+ <Link
+  href="/products"
+  className="inline-flex items-center justify-center border-2 border-[#111111] bg-[#111111] px-8 py-4 text-center text-sm font-semibold uppercase tracking-[0.12em] !text-white transition-all duration-300 hover:border-[#c6a15b] hover:bg-[#c6a15b] !hover:text-white"
+>
+  Shop Collection
+</Link>
 
   {/* EXPLORE WOMEN */}
   <Link

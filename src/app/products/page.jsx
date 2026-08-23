@@ -1,7 +1,6 @@
 "use client";
 
-import { Suspense, useMemo, useState } from "react";
-import Link from "next/link";
+import { useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
 import Navbar from "@/components/navbar/Navbar";
@@ -11,12 +10,12 @@ import ProductGrid from "@/components/products/ProductGrid";
 import products from "@/data/products";
 import categories from "@/data/categories";
 
-/* =====================================================
-   PRODUCTS CONTENT
-===================================================== */
-
-function ProductsContent() {
+export default function ProductsPage() {
   const searchParams = useSearchParams();
+
+  // =========================
+  // SEARCH
+  // =========================
 
   const urlSearch = searchParams.get("search") || "";
 
@@ -25,10 +24,14 @@ function ProductsContent() {
   const [sort, setSort] = useState("featured");
   const [maxPrice, setMaxPrice] = useState(5000);
 
+  // =========================
+  // FILTER + SORT
+  // =========================
+
   const filteredProducts = useMemo(() => {
     let result = [...products];
 
-    /* SEARCH */
+    // SEARCH
     if (search.trim()) {
       const query = search.trim().toLowerCase();
 
@@ -47,7 +50,7 @@ function ProductsContent() {
       });
     }
 
-    /* CATEGORY */
+    // CATEGORY
     if (category !== "All") {
       result = result.filter(
         (product) =>
@@ -56,12 +59,12 @@ function ProductsContent() {
       );
     }
 
-    /* PRICE */
+    // PRICE
     result = result.filter(
       (product) => product.price <= maxPrice
     );
 
-    /* SORT */
+    // SORT
     if (sort === "price-low") {
       result.sort((a, b) => a.price - b.price);
     }
@@ -81,7 +84,9 @@ function ProductsContent() {
     return result;
   }, [search, category, maxPrice, sort]);
 
-  /* CLEAR FILTERS */
+  // =========================
+  // CLEAR FILTERS
+  // =========================
 
   const clearFilters = () => {
     setSearch("");
@@ -102,36 +107,47 @@ function ProductsContent() {
 
       <main className="min-h-screen bg-[#f5efe6]">
 
-        {/* HEADER */}
+        {/* =================================================
+            PAGE HEADER
+        ================================================= */}
 
-        <section className="border-b border-black/10 bg-[#f5efe6] px-6 py-14 lg:px-8">
+        <section className="border-b border-black/10 bg-[#f5efe6] px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
+
           <div className="mx-auto max-w-7xl">
 
-            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[#c6a15b]">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-[#c6a15b] sm:text-xs sm:tracking-[0.3em]">
               LUXORA Collection
             </p>
 
-            <h1 className="mt-3 font-serif text-4xl text-[#111111] sm:text-5xl">
+            <h1 className="mt-2 font-serif text-3xl leading-tight text-[#111111] sm:mt-3 sm:text-5xl">
               All Products
             </h1>
 
-            <p className="mt-4 max-w-xl text-sm leading-6 text-[#6b6258]">
+            <p className="mt-3 max-w-xl text-xs leading-6 text-[#6b6258] sm:mt-4 sm:text-sm">
               Discover our curated collection of timeless
               fashion, modern essentials and luxury
               accessories.
             </p>
 
           </div>
+
         </section>
 
-        {/* SHOP AREA */}
+        {/* =================================================
+            SHOP AREA
+        ================================================= */}
 
-        <section className="px-6 py-10 lg:px-8">
+        <section className="px-4 py-7 sm:px-6 sm:py-10 lg:px-8">
+
           <div className="mx-auto max-w-7xl">
 
-            {/* SEARCH + SORT */}
+            {/* =================================================
+                SEARCH + SORT
+            ================================================= */}
 
-            <div className="flex flex-col gap-4 border-b border-black/10 pb-6 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex flex-col gap-3 border-b border-black/10 pb-5 sm:gap-4 sm:pb-6 lg:flex-row lg:items-center lg:justify-between">
+
+              {/* SEARCH */}
 
               <div className="relative w-full lg:max-w-md">
 
@@ -142,7 +158,7 @@ function ProductsContent() {
                     setSearch(e.target.value)
                   }
                   placeholder="Search products..."
-                  className="w-full border border-black/15 bg-white px-4 py-3 pr-10 text-sm outline-none transition focus:border-[#c6a15b]"
+                  className="h-11 w-full border border-black/15 bg-white px-4 pr-10 text-xs outline-none transition focus:border-[#c6a15b] sm:h-12 sm:text-sm"
                 />
 
                 <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">
@@ -151,12 +167,14 @@ function ProductsContent() {
 
               </div>
 
+              {/* SORT */}
+
               <select
                 value={sort}
                 onChange={(e) =>
                   setSort(e.target.value)
                 }
-                className="border border-black/15 bg-white px-4 py-3 text-sm outline-none focus:border-[#c6a15b]"
+                className="h-11 w-full border border-black/15 bg-white px-4 text-xs outline-none focus:border-[#c6a15b] sm:h-12 sm:text-sm lg:w-auto lg:min-w-[190px]"
               >
                 <option value="featured">
                   Sort: Featured
@@ -181,11 +199,15 @@ function ProductsContent() {
 
             </div>
 
-            {/* SHOP GRID */}
+            {/* =================================================
+                SHOP CONTENT
+            ================================================= */}
 
-            <div className="mt-8 grid gap-8 lg:grid-cols-[230px_1fr]">
+            <div className="mt-6 lg:mt-8 lg:grid lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-8">
 
-              {/* DESKTOP SIDEBAR */}
+              {/* =================================================
+                  DESKTOP SIDEBAR
+              ================================================= */}
 
               <aside className="hidden lg:block">
 
@@ -233,6 +255,7 @@ function ProductsContent() {
                       ))}
 
                     </div>
+
                   </div>
 
                   {/* PRICE */}
@@ -258,7 +281,6 @@ function ProductsContent() {
                     />
 
                     <div className="mt-3 flex justify-between text-xs text-[#6b6258]">
-
                       <span>₹500</span>
 
                       <span>
@@ -267,7 +289,6 @@ function ProductsContent() {
                           "en-IN"
                         )}
                       </span>
-
                     </div>
 
                   </div>
@@ -276,52 +297,62 @@ function ProductsContent() {
 
               </aside>
 
-              {/* PRODUCTS */}
+              {/* =================================================
+                  PRODUCTS AREA
+              ================================================= */}
 
-              <div>
+              <div className="min-w-0">
 
-                {/* MOBILE CATEGORIES */}
+                {/* =================================================
+                    MOBILE CATEGORY FILTER
+                ================================================= */}
 
-                <div className="mb-6 flex gap-2 overflow-x-auto pb-2 lg:hidden">
+                <div className="mb-5 -mx-4 overflow-x-auto px-4 pb-2 sm:-mx-6 sm:px-6 lg:hidden">
 
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setCategory("All")
-                    }
-                    className={`whitespace-nowrap border px-4 py-2 text-xs ${
-                      category === "All"
-                        ? "border-[#111111] bg-[#111111] text-white"
-                        : "border-black/15 bg-white"
-                    }`}
-                  >
-                    All
-                  </button>
+                  <div className="flex w-max gap-2">
 
-                  {categories.map((item) => (
                     <button
                       type="button"
-                      key={item.id}
                       onClick={() =>
-                        setCategory(item.name)
+                        setCategory("All")
                       }
-                      className={`whitespace-nowrap border px-4 py-2 text-xs ${
-                        category === item.name
+                      className={`whitespace-nowrap border px-4 py-2.5 text-[10px] font-medium uppercase tracking-wider transition ${
+                        category === "All"
                           ? "border-[#111111] bg-[#111111] text-white"
-                          : "border-black/15 bg-white"
+                          : "border-black/15 bg-white text-[#111111]"
                       }`}
                     >
-                      {item.name}
+                      All
                     </button>
-                  ))}
+
+                    {categories.map((item) => (
+                      <button
+                        type="button"
+                        key={item.id}
+                        onClick={() =>
+                          setCategory(item.name)
+                        }
+                        className={`whitespace-nowrap border px-4 py-2.5 text-[10px] font-medium uppercase tracking-wider transition ${
+                          category === item.name
+                            ? "border-[#111111] bg-[#111111] text-white"
+                            : "border-black/15 bg-white text-[#111111]"
+                        }`}
+                      >
+                        {item.name}
+                      </button>
+                    ))}
+
+                  </div>
 
                 </div>
 
-                {/* COUNT */}
+                {/* =================================================
+                    COUNT + CLEAR
+                ================================================= */}
 
-                <div className="mb-6 flex items-center justify-between gap-4">
+                <div className="mb-5 flex items-center justify-between gap-3">
 
-                  <p className="text-sm text-[#6b6258]">
+                  <p className="text-xs text-[#6b6258] sm:text-sm">
 
                     <span className="font-semibold text-[#111111]">
                       {filteredProducts.length}
@@ -340,7 +371,7 @@ function ProductsContent() {
                     <button
                       type="button"
                       onClick={clearFilters}
-                      className="text-xs font-medium uppercase tracking-wider underline underline-offset-4 transition hover:text-[#c6a15b]"
+                      className="shrink-0 text-[10px] font-medium uppercase tracking-wider underline underline-offset-4 transition hover:text-[#c6a15b] sm:text-xs"
                     >
                       Clear Filters
                     </button>
@@ -348,7 +379,9 @@ function ProductsContent() {
 
                 </div>
 
-                {/* GRID */}
+                {/* =================================================
+                    PRODUCT GRID
+                ================================================= */}
 
                 {filteredProducts.length > 0 && (
                   <ProductGrid
@@ -361,33 +394,36 @@ function ProductsContent() {
             </div>
 
           </div>
+
         </section>
 
-        {/* EMPTY STATE */}
+        {/* =================================================
+            EMPTY STATE
+        ================================================= */}
 
         {filteredProducts.length === 0 && (
-          <section className="px-6 pb-20">
+          <section className="px-4 pb-16 sm:px-6 sm:pb-20">
 
             <div className="mx-auto max-w-xl text-center">
 
-              <div className="bg-white px-8 py-16">
+              <div className="bg-white px-5 py-12 sm:px-8 sm:py-16">
 
                 <div className="text-4xl">
                   ♡
                 </div>
 
-                <p className="mt-5 font-serif text-2xl text-[#111111]">
+                <p className="mt-5 font-serif text-xl text-[#111111] sm:text-2xl">
                   No products found
                 </p>
 
-                <p className="mt-3 text-sm text-[#6b6258]">
+                <p className="mt-3 text-xs text-[#6b6258] sm:text-sm">
                   Try changing your search or filters.
                 </p>
 
                 <button
                   type="button"
                   onClick={clearFilters}
-                  className="mt-6 inline-block bg-[#111111] px-7 py-3 text-xs font-semibold uppercase tracking-wider text-white transition hover:bg-[#c6a15b]"
+                  className="mt-6 bg-[#111111] px-6 py-3 text-[10px] font-semibold uppercase tracking-wider text-white transition hover:bg-[#c6a15b] sm:px-7 sm:text-xs"
                 >
                   Clear Filters
                 </button>
@@ -403,25 +439,5 @@ function ProductsContent() {
 
       <Footer />
     </>
-  );
-}
-
-/* =====================================================
-   PAGE WITH SUSPENSE
-===================================================== */
-
-export default function ProductsPage() {
-  return (
-    <Suspense
-      fallback={
-        <main className="flex min-h-screen items-center justify-center bg-[#f5efe6]">
-          <p className="text-sm text-[#6b6258]">
-            Loading LUXORA Collection...
-          </p>
-        </main>
-      }
-    >
-      <ProductsContent />
-    </Suspense>
   );
 }

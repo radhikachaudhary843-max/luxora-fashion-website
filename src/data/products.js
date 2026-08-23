@@ -66,7 +66,7 @@ const products = [
     reviews: 108,
     sizes: ["S", "M", "L", "XL"],
     colors: ["Champagne"],
-    image: "/images/products/champagne-slip-dress.jpg",
+    image: "/images/products/satin-evening-dress1.jpg",
     badge: "Premium",
     stock: 15,
   },
