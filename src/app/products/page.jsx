@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
@@ -11,10 +11,13 @@ import ProductGrid from "@/components/products/ProductGrid";
 import products from "@/data/products";
 import categories from "@/data/categories";
 
-export default function ProductsPage() {
+/* =====================================================
+   PRODUCTS CONTENT
+===================================================== */
+
+function ProductsContent() {
   const searchParams = useSearchParams();
 
-  // Search coming from Navbar URL
   const urlSearch = searchParams.get("search") || "";
 
   const [search, setSearch] = useState(urlSearch);
@@ -25,10 +28,7 @@ export default function ProductsPage() {
   const filteredProducts = useMemo(() => {
     let result = [...products];
 
-    // =========================
-    // SEARCH
-    // =========================
-
+    /* SEARCH */
     if (search.trim()) {
       const query = search.trim().toLowerCase();
 
@@ -47,10 +47,7 @@ export default function ProductsPage() {
       });
     }
 
-    // =========================
-    // CATEGORY
-    // =========================
-
+    /* CATEGORY */
     if (category !== "All") {
       result = result.filter(
         (product) =>
@@ -59,18 +56,12 @@ export default function ProductsPage() {
       );
     }
 
-    // =========================
-    // PRICE
-    // =========================
-
+    /* PRICE */
     result = result.filter(
       (product) => product.price <= maxPrice
     );
 
-    // =========================
-    // SORTING
-    // =========================
-
+    /* SORT */
     if (sort === "price-low") {
       result.sort((a, b) => a.price - b.price);
     }
@@ -90,9 +81,7 @@ export default function ProductsPage() {
     return result;
   }, [search, category, maxPrice, sort]);
 
-  // =========================
-  // CLEAR FILTERS
-  // =========================
+  /* CLEAR FILTERS */
 
   const clearFilters = () => {
     setSearch("");
@@ -100,7 +89,6 @@ export default function ProductsPage() {
     setMaxPrice(5000);
     setSort("featured");
 
-    // Remove search query from URL
     window.history.replaceState(
       {},
       "",
@@ -114,12 +102,9 @@ export default function ProductsPage() {
 
       <main className="min-h-screen bg-[#f5efe6]">
 
-        {/* =========================
-            HEADER
-        ========================= */}
+        {/* HEADER */}
 
         <section className="border-b border-black/10 bg-[#f5efe6] px-6 py-14 lg:px-8">
-
           <div className="mx-auto max-w-7xl">
 
             <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[#c6a15b]">
@@ -137,22 +122,16 @@ export default function ProductsPage() {
             </p>
 
           </div>
-
         </section>
 
-        {/* =========================
-            SHOP AREA
-        ========================= */}
+        {/* SHOP AREA */}
 
         <section className="px-6 py-10 lg:px-8">
-
           <div className="mx-auto max-w-7xl">
 
             {/* SEARCH + SORT */}
 
             <div className="flex flex-col gap-4 border-b border-black/10 pb-6 lg:flex-row lg:items-center lg:justify-between">
-
-              {/* SEARCH */}
 
               <div className="relative w-full lg:max-w-md">
 
@@ -172,8 +151,6 @@ export default function ProductsPage() {
 
               </div>
 
-              {/* SORT */}
-
               <select
                 value={sort}
                 onChange={(e) =>
@@ -181,7 +158,6 @@ export default function ProductsPage() {
                 }
                 className="border border-black/15 bg-white px-4 py-3 text-sm outline-none focus:border-[#c6a15b]"
               >
-
                 <option value="featured">
                   Sort: Featured
                 </option>
@@ -201,20 +177,15 @@ export default function ProductsPage() {
                 <option value="discount">
                   Biggest Discount
                 </option>
-
               </select>
 
             </div>
 
-            {/* =========================
-                SHOP GRID
-            ========================= */}
+            {/* SHOP GRID */}
 
             <div className="mt-8 grid gap-8 lg:grid-cols-[230px_1fr]">
 
-              {/* =========================
-                  DESKTOP SIDEBAR
-              ========================= */}
+              {/* DESKTOP SIDEBAR */}
 
               <aside className="hidden lg:block">
 
@@ -230,8 +201,6 @@ export default function ProductsPage() {
 
                     <div className="mt-5 space-y-3">
 
-                      {/* ALL */}
-
                       <button
                         type="button"
                         onClick={() =>
@@ -246,10 +215,7 @@ export default function ProductsPage() {
                         All Products
                       </button>
 
-                      {/* CATEGORY LIST */}
-
                       {categories.map((item) => (
-
                         <button
                           type="button"
                           key={item.id}
@@ -264,16 +230,12 @@ export default function ProductsPage() {
                         >
                           {item.name}
                         </button>
-
                       ))}
 
                     </div>
-
                   </div>
 
-                  {/* =========================
-                      PRICE FILTER
-                  ========================= */}
+                  {/* PRICE */}
 
                   <div className="pt-7">
 
@@ -297,9 +259,7 @@ export default function ProductsPage() {
 
                     <div className="mt-3 flex justify-between text-xs text-[#6b6258]">
 
-                      <span>
-                        ₹500
-                      </span>
+                      <span>₹500</span>
 
                       <span>
                         ₹
@@ -316,19 +276,13 @@ export default function ProductsPage() {
 
               </aside>
 
-              {/* =========================
-                  PRODUCTS AREA
-              ========================= */}
+              {/* PRODUCTS */}
 
               <div>
 
-                {/* =========================
-                    MOBILE CATEGORIES
-                ========================= */}
+                {/* MOBILE CATEGORIES */}
 
                 <div className="mb-6 flex gap-2 overflow-x-auto pb-2 lg:hidden">
-
-                  {/* ALL */}
 
                   <button
                     type="button"
@@ -344,10 +298,7 @@ export default function ProductsPage() {
                     All
                   </button>
 
-                  {/* CATEGORIES */}
-
                   {categories.map((item) => (
-
                     <button
                       type="button"
                       key={item.id}
@@ -362,14 +313,11 @@ export default function ProductsPage() {
                     >
                       {item.name}
                     </button>
-
                   ))}
 
                 </div>
 
-                {/* =========================
-                    PRODUCT COUNT
-                ========================= */}
+                {/* COUNT */}
 
                 <div className="mb-6 flex items-center justify-between gap-4">
 
@@ -385,13 +333,10 @@ export default function ProductsPage() {
 
                   </p>
 
-                  {/* CLEAR FILTERS */}
-
                   {(search ||
                     category !== "All" ||
                     maxPrice !== 5000 ||
                     sort !== "featured") && (
-
                     <button
                       type="button"
                       onClick={clearFilters}
@@ -399,14 +344,11 @@ export default function ProductsPage() {
                     >
                       Clear Filters
                     </button>
-
                   )}
 
                 </div>
 
-                {/* =========================
-                    PRODUCT GRID
-                ========================= */}
+                {/* GRID */}
 
                 {filteredProducts.length > 0 && (
                   <ProductGrid
@@ -419,15 +361,11 @@ export default function ProductsPage() {
             </div>
 
           </div>
-
         </section>
 
-        {/* =========================
-            EMPTY STATE
-        ========================= */}
+        {/* EMPTY STATE */}
 
         {filteredProducts.length === 0 && (
-
           <section className="px-6 pb-20">
 
             <div className="mx-auto max-w-xl text-center">
@@ -459,12 +397,31 @@ export default function ProductsPage() {
             </div>
 
           </section>
-
         )}
 
       </main>
 
       <Footer />
     </>
+  );
+}
+
+/* =====================================================
+   PAGE WITH SUSPENSE
+===================================================== */
+
+export default function ProductsPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="flex min-h-screen items-center justify-center bg-[#f5efe6]">
+          <p className="text-sm text-[#6b6258]">
+            Loading LUXORA Collection...
+          </p>
+        </main>
+      }
+    >
+      <ProductsContent />
+    </Suspense>
   );
 }
